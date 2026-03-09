@@ -41,7 +41,7 @@ Installation
 Clone the repository
 Copy code
 
-git clone https://github.com/yourusername/healthcare-intelligence-platform.git
+git clone https://github.com/ShivamGangwar9794/Health-Care-Intelligence-Platform-ML-Project.git
 Navigate to project folder
 Copy code
 
