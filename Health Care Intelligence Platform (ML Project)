@@ -1,0 +1,197 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.cluster import KMeans
+from sklearn.metrics import accuracy_score
+
+
+st.title("Health Care Intelligence Platform")
+
+st.write("Machine Learning Based Disease Prediction System")
+
+
+# -----------------------------
+# Diabetes Prediction Model
+# -----------------------------
+
+diabetes_data = pd.read_csv("diabetes.csv")
+
+X_diabetes = diabetes_data.drop("Outcome", axis=1)
+y_diabetes = diabetes_data["Outcome"]
+
+X_train_d, X_test_d, y_train_d, y_test_d = train_test_split(
+    X_diabetes, y_diabetes, test_size=0.2, random_state=42
+)
+
+diabetes_model = LogisticRegression(max_iter=1000)
+diabetes_model.fit(X_train_d, y_train_d)
+
+diabetes_accuracy = accuracy_score(
+    y_test_d, diabetes_model.predict(X_test_d)
+)
+
+
+# -----------------------------
+# Heart Disease Prediction
+# -----------------------------
+
+heart_data = pd.read_csv("heart.csv")
+
+X_heart = heart_data.drop("target", axis=1)
+y_heart = heart_data["target"]
+
+X_train_h, X_test_h, y_train_h, y_test_h = train_test_split(
+    X_heart, y_heart, test_size=0.2, random_state=42
+)
+
+heart_model = RandomForestClassifier()
+heart_model.fit(X_train_h, y_train_h)
+
+heart_accuracy = accuracy_score(
+    y_test_h, heart_model.predict(X_test_h)
+)
+
+
+# -----------------------------
+# Sidebar Menu
+# -----------------------------
+
+menu = st.sidebar.selectbox(
+    "Select Service",
+    [
+        "Diabetes Prediction",
+        "Heart Disease Prediction",
+        "Disease Clustering",
+        "Medicine Recommendation",
+    ],
+)
+
+
+# -----------------------------
+# Diabetes Prediction
+# -----------------------------
+
+if menu == "Diabetes Prediction":
+
+    st.header("Diabetes Prediction")
+
+    pregnancies = st.number_input("Pregnancies")
+    glucose = st.number_input("Glucose")
+    bp = st.number_input("Blood Pressure")
+    skin = st.number_input("Skin Thickness")
+    insulin = st.number_input("Insulin")
+    bmi = st.number_input("BMI")
+    dpf = st.number_input("Diabetes Pedigree Function")
+    age = st.number_input("Age")
+
+    if st.button("Predict Diabetes"):
+
+        input_data = np.array(
+            [[pregnancies, glucose, bp, skin, insulin, bmi, dpf, age]]
+        )
+
+        prediction = diabetes_model.predict(input_data)
+
+        if prediction[0] == 1:
+            st.error("High Risk of Diabetes")
+        else:
+            st.success("Low Risk of Diabetes")
+
+
+# -----------------------------
+# Heart Disease Prediction
+# -----------------------------
+
+elif menu == "Heart Disease Prediction":
+
+    st.header("Heart Disease Prediction")
+
+    age = st.number_input("Age")
+    sex = st.number_input("Sex (1=Male, 0=Female)")
+    cp = st.number_input("Chest Pain Type")
+    trestbps = st.number_input("Resting Blood Pressure")
+    chol = st.number_input("Cholesterol")
+    fbs = st.number_input("Fasting Blood Sugar")
+    restecg = st.number_input("Rest ECG")
+    thalach = st.number_input("Max Heart Rate")
+    exang = st.number_input("Exercise Induced Angina")
+    oldpeak = st.number_input("Old Peak")
+    slope = st.number_input("Slope")
+    ca = st.number_input("Major Vessels")
+    thal = st.number_input("Thal")
+
+    if st.button("Predict Heart Disease"):
+
+        input_data = np.array(
+            [[
+                age,
+                sex,
+                cp,
+                trestbps,
+                chol,
+                fbs,
+                restecg,
+                thalach,
+                exang,
+                oldpeak,
+                slope,
+                ca,
+                thal,
+            ]]
+        )
+
+        prediction = heart_model.predict(input_data)
+
+        if prediction[0] == 1:
+            st.error("High Risk of Heart Disease")
+        else:
+            st.success("Low Risk of Heart Disease")
+
+
+# -----------------------------
+# Disease Clustering
+# -----------------------------
+
+elif menu == "Disease Clustering":
+
+    st.header("Patient Disease Clustering")
+
+    kmeans = KMeans(n_clusters=3)
+
+    kmeans.fit(X_diabetes)
+
+    clusters = kmeans.predict(X_diabetes)
+
+    st.write("Patients grouped into clusters for disease analysis")
+
+
+# -----------------------------
+# Medicine Recommendation
+# -----------------------------
+
+elif menu == "Medicine Recommendation":
+
+    st.header("Medicine Recommendation")
+
+    disease = st.selectbox(
+        "Select Disease",
+        ["Diabetes", "Heart Disease", "Hypertension", "Flu"],
+    )
+
+    if st.button("Recommend Medicine"):
+
+        if disease == "Diabetes":
+            st.success("Recommended Medicine: Metformin")
+
+        elif disease == "Heart Disease":
+            st.success("Recommended Medicine: Aspirin")
+
+        elif disease == "Hypertension":
+            st.success("Recommended Medicine: Amlodipine")
+
+        elif disease == "Flu":
+            st.success("Recommended Medicine: Paracetamol")
